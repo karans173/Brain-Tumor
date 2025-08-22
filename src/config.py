@@ -1,0 +1,14 @@
+TRAIN_PATH = "C:/Brain Tumor/Datasets/MRI/Training/"
+TEST_PATH = "C:/Brain Tumor/Datasets/MRI/Testing/"
+
+MODEL_SAVE_PATH = "C:/Brain Tumor/model/Brain_Tumor_Classifier.keras"
+
+IMAGE_WIDTH = 299
+IMAGE_HEIGHT = 299
+IMAGE_CHANNELS = 3
+INPUT_SHAPE = (IMAGE_WIDTH,IMAGE_HEIGHT,IMAGE_CHANNELS)
+NUM_CLASSES = 4
+
+BATCH_SIZE = 32
+EPOCH = 10
+LEARNING_RATE = 0.001

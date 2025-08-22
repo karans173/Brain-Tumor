@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for category, message in messages %}
+          <li class="flash-{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        <h1>🧠 Brain Tumor MRI Classification</h1>
+        <p>Upload a brain MRI to classify the tumor type (Glioma, Meningioma, Pituitary) or No Tumor.</p>
+
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" class="file-input" required>
+            <button type="submit" class="submit-btn">Classify Tumor</button>
+        </form>
+
+        {% if prediction %}
+        <div class="results-section">
+            <h2>Results</h2>
+            <div class="results-grid">
+                <div class="image-card">
+                    <h3>Uploaded MRI</h3>
+                    {% if uploaded_image_path %}
+                        <img src="{{ url_for('static', filename=uploaded_image_path) }}" alt="Uploaded Image">
+                    {% endif %}
+                </div>
+                <div class="image-card">
+                    <h3>Explainability (Grad-CAM)</h3>
+                    {% if grad_cam_path %}
+                        <img src="{{ url_for('static', filename=grad_cam_path) }}" alt="Grad-CAM Image">
+                        <p class="info-text">Highlighted regions show where the model focused to make its prediction.</p>
+                    {% else %}
+                        <p>Grad-CAM could not be generated.</p>
+                    {% endif %}
+                </div>
+                <div class="prediction-card">
+                    <h3>Prediction</h3>
+                    <p class="prediction-text">{{ prediction }}</p>
+                    <h4>Confidence Scores</h4>
+                    <canvas id="probChart"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="history-section">
+            <h2>Prediction History</h2>
+            {% if history %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Filename</th>
+                        <th>Prediction</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in history %}
+                    <tr>
+                        <td>{{ row.timestamp }}</td>
+                        <td>{{ row.filename }}</td>
+                        <td>{{ row.prediction }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No prediction history yet.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if probabilities %}
+    <script>
+        const ctx = document.getElementById('probChart').getContext('2d');
+        const probabilities = {{ probabilities|tojson|safe }};
+        const labels = Object.keys(probabilities).map(label => label.charAt(0).toUpperCase() + label.slice(1));
+        const data = Object.values(probabilities);
+        new Chart(ctx, {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ label: 'Probability', data: data, backgroundColor: 'rgba(54, 162, 235, 0.6)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1 }] },
+            options: { indexAxis: 'y', scales: { x: { beginAtZero: true, max: 1.0 } }, plugins: { legend: { display: false } } }
+        });
+    </script>
+    {% endif %}
+</body>
+</html>

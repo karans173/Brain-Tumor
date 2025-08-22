@@ -1,0 +1,27 @@
+# Large Data and Model Files
+/data/
+/models/
+
+# Generated files by the app
+/app/static/uploads/
+/app/static/grad_cam/
+/app/log.csv
+
+# Python virtual environment
+/venv/
+/env/
+.env
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE and OS specific files
+.idea/
+.vscode/
+.DS_Store
+*.ipynb_checkpoints
+
+# Training output
+/training_history.png
